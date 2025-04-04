@@ -7,15 +7,19 @@ import '../../main.dart';
 
 class ModifierArticleCtrl extends StateNotifier<ModifierArticleState>{
   var blogNetworkService = getIt.get<BloNetworkService>();
+
   ModifierArticleCtrl():super(ModifierArticleState()){
     recupererCategories();
+    recupererArticleParId(1);
   }
 
   Future<void> recupererArticleParId(int articleId) async{
-    //state = state.copyWith(article: )
+    state=state.copyWith(isLoading: true);
+    var res= await blogNetworkService.recupererArticle(articleId);
+    state=state.copyWith(isLoading: false, article: res);
   }
-  Future<void> recupererCategories() async{
 
+  Future<void> recupererCategories() async{
     state=state.copyWith(isLoading: true);
     var res= await blogNetworkService.recupererCategories();
     state=state.copyWith(isLoading: false, categories: res);
@@ -27,3 +31,4 @@ class ModifierArticleCtrl extends StateNotifier<ModifierArticleState>{
 final modifierArticleCtrlProvider = StateNotifierProvider<ModifierArticleCtrl, ModifierArticleState>((ref){
   return ModifierArticleCtrl();
 });
+

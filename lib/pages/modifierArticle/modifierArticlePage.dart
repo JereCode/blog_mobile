@@ -1,3 +1,4 @@
+import 'package:blog_mobile/Business/models/Article.dart';
 import 'package:blog_mobile/Business/models/Category.dart';
 import 'package:blog_mobile/pages/modifierArticle/modifierArticleCtrl.dart';
 import 'package:flutter/material.dart';
@@ -18,11 +19,10 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
 
   int? _selectedCategory;
   List<Category> selectedCategories=[];
+  Article? _article;
 
-  final List<String> _options = ["Option 1", "Option 2", "Option 3", "Option 4"];
-  List<String> _selectedOptions = [];
-
-
+  List<Category> _options = [];
+  List<int> _selectedOptions = [];
 
   @override
   void dispose() {
@@ -35,7 +35,8 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
   @override
   Widget build(BuildContext context) {
     var state= ref.watch(modifierArticleCtrlProvider);
-
+    _options = state.categories?? [];
+    _article = state.article;
     return Scaffold(
       appBar: AppBar(
         title:  Text('Modifier l\'article'),
@@ -52,10 +53,9 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: _titleController,
+              controller: TextEditingController(text: _article?.title??""),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Titre exemple',
               ),
             ),
             const SizedBox(height: 8),
@@ -65,10 +65,9 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: _imageUrlController,
+              controller: TextEditingController(text: _article?.photo??""),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'https://example.com/image.jpg',
               ),
             ),
             const SizedBox(height: 24),
@@ -80,12 +79,13 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
             ),
             const SizedBox(height: 8),
             TextField(
-              controller: _authorController,
+              controller: TextEditingController(text: _article?.auteur??""),
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Auteur exemple',
               ),
             ),
+
+            // Section Categorie
             const SizedBox(height: 8),
             const Text(
               'Catégorie',
@@ -102,43 +102,6 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
                 hintText: 'Titre exemple',
               ),
             ),
-          /*  DropDownMultiSelect<Category>(
-              onChanged: (List<Category> x) {
-                setState(() {
-                  selectedCategories =x;
-                });
-              },
-              options: (state.categories?? []),
-              selectedValues: selectedCategories,
-              childBuilder: (selected){
-                return Wrap(children: selected.map((e){
-                  return Text(e.name??"");
-                }).toList());
-              },
-              // whenEmpty: 'Selectionner une categorie',
-              menuItembuilder: (option){
-                return Text(option.name?? "");
-              },
-            ),*/
-
-           /* DropdownButtonFormField<int>(
-              value: _selectedCategory,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Sélectionnez une catégorie',
-              ),
-              items: (state.categories?? []).map((value) {
-                return DropdownMenuItem<int>(
-                  value: value.id,
-                  child: Text(value.name?? ""),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedCategory = newValue;
-                });
-              },
-            ),*/
             const SizedBox(height: 24),
 
             // Séparateur
@@ -229,7 +192,7 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
   }
 
   void _showMultiSelectDialog(BuildContext context) async {
-    List<String> tempSelectedOptions = List.from(_selectedOptions);
+    List<int> tempSelectedOptions = List.from(_selectedOptions);
 
     await showDialog(
       context: context,
@@ -242,14 +205,14 @@ class _ModifyArticleScreenState extends ConsumerState<ModifierArticlePage> {
                 child: Column(
                   children: _options.map((option) {
                     return CheckboxListTile(
-                      value: tempSelectedOptions.contains(option),
-                      title: Text(option),
+                      value: _selectedOptions.contains(option.id),
+                      title: Text(option.name??""),
                       onChanged: (isChecked) {
                         setState(() {
                           if (isChecked ?? false) {
-                            tempSelectedOptions.add(option);
+                            _selectedOptions.add(option.id??0);
                           } else {
-                            tempSelectedOptions.remove(option);
+                            _selectedOptions.remove(option.id??0);
                           }
                         });
                       },
