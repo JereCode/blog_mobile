@@ -16,3 +16,7 @@ class BlogLocalServiceImpl implements BloglocalService{
   }
 
 }
+
+void  main(){
+
+}
